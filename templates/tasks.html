@@ -1,0 +1,116 @@
+{% extends "layout.html" %}
+{% block header_title %}Tasks & Projects{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b flex justify-between items-center bg-gray-50">
+        <h3 class="font-bold text-gray-700"><i class="fas fa-tasks mr-2"></i> Project Tracking</h3>
+        {% if user.role == 'Head of Department' %}
+        <button onclick="toggleModal('taskModal')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 shadow-sm text-sm font-bold flex items-center">
+            <i class="fas fa-plus mr-2"></i> Assign Task
+        </button>
+        {% endif %}
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left">
+            <thead class="bg-gray-100 text-gray-500 text-xs uppercase">
+                <tr>
+                    <th class="px-6 py-3">Project Name</th>
+                    <th class="px-6 py-3">Assignee</th>
+                    <th class="px-6 py-3">Status</th>
+                    <th class="px-6 py-3 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y text-sm">
+                {% for proj in projects %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 font-medium text-gray-800">
+                        {{ proj.title }}
+                        <div class="text-xs text-red-500 mt-1 font-bold">Due: {{ proj.due }}</div>
+                    </td>
+                    <td class="px-6 py-4 flex items-center">
+                        <div class="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs mr-3 font-bold border border-blue-200">
+                            {{ proj.assignee[0] }}
+                        </div>
+                        <span class="text-gray-600">{{ proj.assignee }}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold border
+                            {% if proj.status == 'Completed' %} bg-green-100 text-green-700 border-green-200
+                            {% elif proj.status == 'In Progress' %} bg-yellow-100 text-yellow-700 border-yellow-200
+                            {% else %} bg-gray-100 text-gray-600 border-gray-200 {% endif %}">
+                            {{ proj.status }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                        {% if user.role == 'Head of Department' %}
+                        <button onclick="openEditTaskModal('{{ proj.id }}', '{{ proj.title }}', '{{ proj.assignee }}', '{{ proj.due }}', '{{ proj.status }}')" class="text-blue-500 hover:text-blue-700 p-2 bg-blue-50 rounded-full">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <a href="/delete_task/{{ proj.id }}" onclick="return confirm('Delete this task?');" class="text-red-500 hover:text-red-700 p-2 bg-red-50 rounded-full">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div id="taskModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-75 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg w-full max-w-md p-6">
+        <h3 class="text-lg font-bold mb-4">Assign New Task</h3>
+        <form action="/add_task" method="POST" class="space-y-3">
+            <input type="text" name="title" placeholder="Project / Task Title" required class="w-full border p-2 rounded">
+            <select name="assignee" class="w-full border p-2 rounded">
+                {% for emp in employees %}
+                <option value="{{ emp.name }}">{{ emp.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="date" name="due_date" required class="w-full border p-2 rounded">
+            <div class="flex justify-end space-x-2 mt-4">
+                <button type="button" onclick="toggleModal('taskModal')" class="bg-gray-300 px-4 py-2 rounded">Cancel</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Assign</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="editTaskModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-75 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg w-full max-w-md p-6 border-t-4 border-blue-500">
+        <h3 class="text-lg font-bold mb-4">Edit Task Detail</h3>
+        <form action="/edit_task" method="POST" class="space-y-3">
+            <input type="hidden" id="edit_task_id" name="task_id">
+            <input type="text" id="edit_task_title" name="title" required class="w-full border p-2 rounded">
+            <select id="edit_task_assignee" name="assignee" class="w-full border p-2 rounded">
+                {% for emp in employees %}
+                <option value="{{ emp.name }}">{{ emp.name }}</option>
+                {% endfor %}
+                <option value="Unassigned">Unassigned</option>
+            </select>
+            <select id="edit_task_status" name="status" class="w-full border p-2 rounded">
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
+            <input type="date" id="edit_task_due" name="due_date" required class="w-full border p-2 rounded">
+            <div class="flex justify-end space-x-2 mt-4">
+                <button type="button" onclick="toggleModal('editTaskModal')" class="bg-gray-300 px-4 py-2 rounded">Cancel</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    function openEditTaskModal(id, title, assignee, due, status) {
+        document.getElementById('edit_task_id').value = id;
+        document.getElementById('edit_task_title').value = title;
+        document.getElementById('edit_task_assignee').value = assignee;
+        document.getElementById('edit_task_due').value = due;
+        document.getElementById('edit_task_status').value = status;
+        toggleModal('editTaskModal');
+    }
+</script>
+{% endblock %}
