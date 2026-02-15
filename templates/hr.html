@@ -1,7 +1,10 @@
 {% extends "layout.html" %}
+
 {% block header_title %}HR Database{% endblock %}
+
 {% block content %}
 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden min-h-[600px]">
+    
     <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
         <div class="relative w-72">
             <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
@@ -9,12 +12,14 @@
             </span>
             <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search employee..." class="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm">
         </div>
+
         {% if user.role == 'Head of Department' %}
         <button onclick="toggleModal('addEmpModal')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow-sm flex items-center text-sm font-bold">
             <i class="fas fa-user-plus mr-2"></i> Add New Employee
         </button>
         {% endif %}
     </div>
+    
     <div class="overflow-x-auto">
         <table class="w-full text-left" id="empTable">
             <thead class="bg-gray-100 text-gray-500 text-xs uppercase">
@@ -57,6 +62,7 @@
         </table>
     </div>
 </div>
+
 <div id="addEmpModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-75 flex items-center justify-center p-4">
     <div class="bg-white rounded-lg w-full max-w-md p-6">
         <h3 class="text-lg font-bold mb-4">Add New Staff</h3>
@@ -73,6 +79,7 @@
         </form>
     </div>
 </div>
+
 <div id="editEmpModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-75 flex items-center justify-center p-4">
     <div class="bg-white rounded-lg w-full max-w-md p-6 border-t-4 border-blue-500">
         <h3 class="text-lg font-bold mb-4">Edit Employee Info</h3>
@@ -89,6 +96,7 @@
     </div>
 </div>
 {% endblock %}
+
 {% block scripts %}
 <script>
     function openEditEmpModal(id, name, role, dept) {
