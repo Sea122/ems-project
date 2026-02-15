@@ -3,7 +3,7 @@ import datetime
 app = Flask(__name__)
 app.secret_key = 'super_secret_key_for_sea'
 employees_data = [
-    {"id": "RD6723849000", "password": "Sea+Sea=Sea12345", "name": "Rangsan Somkane", "role": "Head of Department", "dept": "Management", "status": "Active", "is_first_login": False, "avatar": "https://ui-avatars.com/api/?name=Rangsan+Somkane&background=0D8ABC&color=fff"}
+    {"id": "RD6723849001", "password": "Sea+Sea=Sea12345", "name": "Rangsan Somkane", "role": "Head of Department", "dept": "Management", "status": "Active", "is_first_login": False, "avatar": "https://ui-avatars.com/api/?name=Rangsan+Somkane&background=0D8ABC&color=fff"}
 ]
 projects_data = [
     {"id": 1, "title": "AI Core System Update", "assignee": "Rangsan Somkane", "status": "In Progress", "due": "2026-03-01"},
@@ -186,5 +186,6 @@ def logout():
     return redirect(url_for('login'))
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
+
 
 
